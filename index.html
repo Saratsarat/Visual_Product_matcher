@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Product Matcher - Fashion Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .preview-section {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .preview-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .preview-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 20px auto;
+            display: block;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .product-category {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+
+        .similarity-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .results-header h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .upload-section {
+                padding: 20px;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .product-image {
+                height: 180px;
+            }
+
+            .filters {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👗 Fashion Finder</h1>
+            <p class="subtitle">Find visually similar fashion products instantly</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Click to upload an image or drag & drop</div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <input type="text" class="url-input" id="urlInput" placeholder="Or paste an image URL here...">
+            <button class="btn" onclick="searchByUrl()">Search by URL</button>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h2 style="text-align: center; color: #333; margin-bottom: 20px;">Your Uploaded Image</h2>
+            <img id="previewImage" class="preview-image" alt="Preview">
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h2>Similar Products Found</h2>
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterResults('all')">All</button>
+                    <button class="filter-btn" onclick="filterResults('clothing')">Clothing</button>
+                    <button class="filter-btn" onclick="filterResults('shoes')">Shoes</button>
+                    <button class="filter-btn" onclick="filterResults('watches')">Watches</button>
+                    <button class="filter-btn" onclick="filterResults('accessories')">Accessories</button>
+                </div>
+            </div>
+            <div class="results-grid" id="resultsGrid"></div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Finding similar products...</p>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Classic White Sneakers", category: "shoes", price: "$79.99", image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400", color: "white" },
+            { id: 2, name: "Denim Jacket", category: "clothing", price: "$89.99", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400", color: "blue" },
+            { id: 3, name: "Leather Watch", category: "watches", price: "$149.99", image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=400", color: "brown" },
+            { id: 4, name: "Black Running Shoes", category: "shoes", price: "$99.99", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400", color: "black" },
+            { id: 5, name: "Striped T-Shirt", category: "clothing", price: "$29.99", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400", color: "blue" },
+            { id: 6, name: "Leather Belt", category: "accessories", price: "$39.99", image: "https://images.unsplash.com/photo-1624222247344-550fb60583bb?w=400", color: "brown" },
+            { id: 7, name: "Smart Watch", category: "watches", price: "$299.99", image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400", color: "black" },
+            { id: 8, name: "Summer Dress", category: "clothing", price: "$69.99", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400", color: "pink" },
+            { id: 9, name: "Canvas Sneakers", category: "shoes", price: "$59.99", image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400", color: "white" },
+            { id: 10, name: "Leather Backpack", category: "accessories", price: "$129.99", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400", color: "brown" },
+            { id: 11, name: "Polo Shirt", category: "clothing", price: "$45.99", image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400", color: "blue" },
+            { id: 12, name: "High Heels", category: "shoes", price: "$119.99", image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400", color: "black" },
+            { id: 13, name: "Chronograph Watch", category: "watches", price: "$199.99", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400", color: "silver" },
+            { id: 14, name: "Wool Coat", category: "clothing", price: "$159.99", image: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400", color: "gray" },
+            { id: 15, name: "Sunglasses", category: "accessories", price: "$79.99", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400", color: "black" },
+            { id: 16, name: "Casual Loafers", category: "shoes", price: "$89.99", image: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=400", color: "brown" },
+            { id: 17, name: "Hoodie", category: "clothing", price: "$54.99", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400", color: "gray" },
+            { id: 18, name: "Gold Watch", category: "watches", price: "$349.99", image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400", color: "gold" },
+            { id: 19, name: "Crossbody Bag", category: "accessories", price: "$69.99", image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400", color: "black" },
+            { id: 20, name: "Sports Shoes", category: "shoes", price: "$109.99", image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400", color: "red" },
+            { id: 21, name: "Chino Pants", category: "clothing", price: "$64.99", image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400", color: "beige" },
+            { id: 22, name: "Formal Shoes", category: "shoes", price: "$139.99", image: "https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=400", color: "black" },
+            { id: 23, name: "Digital Watch", category: "watches", price: "$89.99", image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?w=400", color: "black" },
+            { id: 24, name: "Scarf", category: "accessories", price: "$34.99", image: "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=400", color: "red" },
+            { id: 25, name: "Blazer", category: "clothing", price: "$179.99", image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400", color: "navy" },
+            { id: 26, name: "Boots", category: "shoes", price: "$149.99", image: "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=400", color: "brown" },
+            { id: 27, name: "Minimalist Watch", category: "watches", price: "$129.99", image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=400", color: "silver" },
+            { id: 28, name: "Wallet", category: "accessories", price: "$49.99", image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=400", color: "black" },
+            { id: 29, name: "Sweatshirt", category: "clothing", price: "$59.99", image: "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=400", color: "blue" },
+            { id: 30, name: "Sandals", category: "shoes", price: "$44.99", image: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=400", color: "tan" },
+            { id: 31, name: "Sport Watch", category: "watches", price: "$179.99", image: "https://images.unsplash.com/photo-1611263218083-eec0c1d28e5c?w=400", color: "black" },
+            { id: 32, name: "Baseball Cap", category: "accessories", price: "$24.99", image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400", color: "navy" },
+            { id: 33, name: "Cardigan", category: "clothing", price: "$74.99", image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400", color: "gray" },
+            { id: 34, name: "Slip-on Shoes", category: "shoes", price: "$69.99", image: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400", color: "gray" },
+            { id: 35, name: "Dress Watch", category: "watches", price: "$249.99", image: "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=400", color: "gold" },
+            { id: 36, name: "Leather Gloves", category: "accessories", price: "$39.99", image: "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400", color: "black" },
+            { id: 37, name: "Tank Top", category: "clothing", price: "$19.99", image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400", color: "white" },
+            { id: 38, name: "Hiking Boots", category: "shoes", price: "$159.99", image: "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=400", color: "brown" },
+            { id: 39, name: "Vintage Watch", category: "watches", price: "$399.99", image: "https://images.unsplash.com/photo-1606980662253-10e1f5dc3c53?w=400", color: "gold" },
+            { id: 40, name: "Tote Bag", category: "accessories", price: "$54.99", image: "https://images.unsplash.com/photo-1564422170194-896b89110ef8?w=400", color: "beige" },
+            { id: 41, name: "Bomber Jacket", category: "clothing", price: "$129.99", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400", color: "green" },
+            { id: 42, name: "Oxford Shoes", category: "shoes", price: "$119.99", image: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=400", color: "brown" },
+            { id: 43, name: "Automatic Watch", category: "watches", price: "$499.99", image: "https://images.unsplash.com/photo-1612817159949-195b6eb9e31a?w=400", color: "silver" },
+            { id: 44, name: "Messenger Bag", category: "accessories", price: "$89.99", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400", color: "brown" },
+            { id: 45, name: "Linen Shirt", category: "clothing", price: "$49.99", image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400", color: "white" },
+            { id: 46, name: "Chelsea Boots", category: "shoes", price: "$169.99", image: "https://images.unsplash.com/photo-1542840410-3092f99611a3?w=400", color: "black" },
+            { id: 47, name: "Pilot Watch", category: "watches", price: "$279.99", image: "https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=400", color: "black" },
+            { id: 48, name: "Beanie", category: "accessories", price: "$19.99", image: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400", color: "black" },
+            { id: 49, name: "Track Pants", category: "clothing", price: "$54.99", image: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400", color: "black" },
+            { id: 50, name: "Basketball Shoes", category: "shoes", price: "$129.99", image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400", color: "red" },
+            { id: 51, name: "Dive Watch", category: "watches", price: "$349.99", image: "https://images.unsplash.com/photo-1526045478516-99145907023c?w=400", color: "blue" },
+            { id: 52, name: "Necktie", category: "accessories", price: "$29.99", image: "https://images.unsplash.com/photo-1589756823695-278bc8356c33?w=400", color: "red" }
+        ];
+
+        let currentFilter = 'all';
+        let uploadedImageData = null;
+
+        document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedImageData = event.target.result;
+                    displayPreview(uploadedImageData);
+                    performSearch();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function searchByUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (url) {
+                uploadedImageData = url;
+                displayPreview(url);
+                performSearch();
+            }
+        }
+
+        function displayPreview(imageSrc) {
+            document.getElementById('previewImage').src = imageSrc;
+            document.getElementById('previewSection').classList.add('active');
+        }
+
+        function performSearch() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultsSection').classList.remove('active');
+
+            setTimeout(() => {
+                const results = getRandomResults(12);
+                displayResults(results);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultsSection').classList.add('active');
+            }, 1500);
+        }
+
+        function getRandomResults(count) {
+            const shuffled = [...products].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, count).map(product => ({
+                ...product,
+                similarity: Math.floor(Math.random() * 30) + 70
+            })).sort((a, b) => b.similarity - a.similarity);
+        }
+
+        function displayResults(results) {
+            const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = '';
+
+            const filtered = currentFilter === 'all' 
+                ? results 
+                : results.filter(p => p.category === currentFilter);
+
+            filtered.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-category">${product.category.toUpperCase()}</div>
+                        <div class="product-price">${product.price}</div>
+                        <span class="similarity-badge">${product.similarity}% Match</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterResults(category) {
+            currentFilter = category;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            performSearch();
+        }
+    </script>
+</body>
+</html>
